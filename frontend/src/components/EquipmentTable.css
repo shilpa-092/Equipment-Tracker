@@ -1,0 +1,22 @@
+.equipment-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.equipment-table th,
+.equipment-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.equipment-table th {
+  background-color: #f2f2f2;
+}
+
+button {
+  margin: 0 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
