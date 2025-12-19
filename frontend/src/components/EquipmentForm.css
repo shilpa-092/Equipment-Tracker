@@ -1,0 +1,16 @@
+.equipment-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.equipment-form input,
+.equipment-form select {
+  padding: 5px;
+}
+
+.equipment-form button {
+  padding: 5px 10px;
+  cursor: pointer;
+  
+}
