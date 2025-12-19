@@ -1,51 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import EquipmentTable from './components/EquipmentTable';
-import EquipmentForm from './components/EquipmentForm';
+import React, { useEffect, useState } from "react";
+import EquipmentTable from "./components/EquipmentTable";
+import EquipmentForm from "./components/EquipmentForm";
+import "./App.css";
 
 function App() {
   const [equipment, setEquipment] = useState([]);
-  const [editingItem, setEditingItem] = useState(null);
+  const [selected, setSelected] = useState(null);
 
-  const fetchData = async () => {
-    const res = await fetch('http://localhost:5000/api/equipment');
-    const data = await res.json();
-    setEquipment(data);
-  };
+  const API_URL = "http://localhost:5000/api/equipment";
 
   useEffect(() => {
-    fetchData();
+    fetchEquipment();
   }, []);
 
-  const addItem = async (item) => {
-    const res = await fetch('http://localhost:5000/api/equipment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(item)
-    });
-    const newItem = await res.json();
-    setEquipment([...equipment, newItem]);
+  const fetchEquipment = async () => {
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      setEquipment(data);
+    } catch (err) {
+      console.error("Error fetching equipment:", err);
+    }
   };
 
-  const updateItem = async (id, updatedItem) => {
-    const res = await fetch(`http://localhost:5000/api/equipment/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedItem)
-    });
-    const newItem = await res.json();
-    setEquipment(equipment.map(e => e.id === id ? newItem : e));
+  const handleAddOrUpdate = async (item) => {
+    try {
+      if (item.id) {
+        await fetch(`${API_URL}/${item.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(item),
+        });
+      } else {
+        await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(item),
+        });
+      }
+      fetchEquipment();
+      setSelected(null);
+    } catch (err) {
+      console.error("Error adding/updating equipment:", err);
+    }
   };
 
-  const deleteItem = async (id) => {
-    await fetch(`http://localhost:5000/api/equipment/${id}`, { method: 'DELETE' });
-    setEquipment(equipment.filter(e => e.id !== id));
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete?")) return;
+    try {
+      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      fetchEquipment();
+    } catch (err) {
+      console.error("Error deleting equipment:", err);
+    }
   };
+
+  const handleEdit = (item) => setSelected(item);
+  const clearSelection = () => setSelected(null);
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div className="App">
       <h1>Equipment Tracker</h1>
-      <EquipmentForm addItem={addItem} editingItem={editingItem} updateItem={updateItem} setEditingItem={setEditingItem} />
-      <EquipmentTable data={equipment} setEditingItem={setEditingItem} deleteItem={deleteItem} />
+      <EquipmentForm onSubmit={handleAddOrUpdate} selected={selected} clearSelection={clearSelection} />
+      <EquipmentTable data={equipment} onEdit={handleEdit} onDelete={handleDelete} />
     </div>
   );
 }
