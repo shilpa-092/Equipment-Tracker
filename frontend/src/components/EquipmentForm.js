@@ -1,53 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import "./EquipmentForm.css";
 
-const EquipmentForm = ({ addItem, editingItem, updateItem, setEditingItem }) => {
-  const [name, setName] = useState('');
-  const [type, setType] = useState('Machine');
-  const [status, setStatus] = useState('Active');
-  const [lastCleaned, setLastCleaned] = useState('');
+export default function EquipmentForm({ onSubmit, selected, clearSelection }) {
+  const [form, setForm] = useState({
+    name: "",
+    type: "Machine",
+    status: "Active",
+    lastCleaned: "",
+  });
 
   useEffect(() => {
-    if (editingItem) {
-      setName(editingItem.name);
-      setType(editingItem.type);
-      setStatus(editingItem.status);
-      setLastCleaned(editingItem.lastCleaned);
-    }
-  }, [editingItem]);
+    if (selected) setForm(selected);
+  }, [selected]);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const item = { name, type, status, lastCleaned };
-    if (editingItem) {
-      updateItem(editingItem.id, item);
-      setEditingItem(null);
-    } else {
-      addItem(item);
+    if (!form.name || !form.lastCleaned) {
+      alert("Please fill in all fields.");
+      return;
     }
-    setName('');
-    setType('Machine');
-    setStatus('Active');
-    setLastCleaned('');
+    onSubmit(form);
+    setForm({ name: "", type: "Machine", status: "Active", lastCleaned: "" });
+    clearSelection();
   };
 
-  return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
-      <input required placeholder="Name" value={name} onChange={e => setName(e.target.value)} />
-      <select value={type} onChange={e => setType(e.target.value)}>
+  return ( <form className="equipment-form" onSubmit={handleSubmit}>
+      <input
+        type="text"
+        name="name"
+        placeholder="Name"
+        value={form.name}
+        onChange={handleChange}
+      />
+      <select name="type" value={form.type} onChange={handleChange}>
         <option>Machine</option>
         <option>Vessel</option>
         <option>Tank</option>
         <option>Mixer</option>
       </select>
-      <select value={status} onChange={e => setStatus(e.target.value)}>
+      <select name="status" value={form.status} onChange={handleChange}>
         <option>Active</option>
         <option>Inactive</option>
         <option>Under Maintenance</option>
       </select>
-      <input type="date" value={lastCleaned} onChange={e => setLastCleaned(e.target.value)} />
-      <button type="submit">{editingItem ? 'Update' : 'Add'}</button>
+      <input
+        type="date"
+        name="lastCleaned"
+        value={form.lastCleaned}
+        onChange={handleChange}
+      />
+      <button type="submit">{selected ? "Update" : "Add"} Equipment</button>
     </form>
   );
-};
-
-export default EquipmentForm;
+}
