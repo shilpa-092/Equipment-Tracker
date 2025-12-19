@@ -1,8 +1,9 @@
-import React from 'react';
+import React from "react";
+import "./EquipmentTable.css";
 
-const EquipmentTable = ({ data, setEditingItem, deleteItem }) => {
+export default function EquipmentTable({ data, onEdit, onDelete }) {
   return (
-    <table border="1" cellPadding="10">
+    <table className="equipment-table">
       <thead>
         <tr>
           <th>Name</th>
@@ -13,21 +14,19 @@ const EquipmentTable = ({ data, setEditingItem, deleteItem }) => {
         </tr>
       </thead>
       <tbody>
-        {data.map(item => (
+        {data.map((item) => (
           <tr key={item.id}>
             <td>{item.name}</td>
             <td>{item.type}</td>
             <td>{item.status}</td>
             <td>{item.lastCleaned}</td>
             <td>
-              <button onClick={() => setEditingItem(item)}>Edit</button>
-              <button onClick={() => deleteItem(item.id)}>Delete</button>
+              <button onClick={() => onEdit(item)}>Edit</button>
+              <button onClick={() => onDelete(item.id)}>Delete</button>
             </td>
           </tr>
         ))}
       </tbody>
     </table>
   );
-};
-
-export default EquipmentTable;
+}
